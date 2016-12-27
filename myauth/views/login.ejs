@@ -1,0 +1,16 @@
+<% include ./base.ejs %>
+
+<div class="container">
+	<h2><%= title %></h2>
+	<form method="post" action="/users/login/">
+      <div class="form-group">
+	      <label for="username">Username:</label>
+	      <input class="form-control" type="text" name="username", placeholder="Enter your username">
+      </div>
+      <div class="form-group">
+	      <label for="password">Password:</label>
+	      <input type="password" class="form-control" name="password", placeholder="Enter your password">
+      </div>
+      <button class="btn btn-default" type="submit" >Submit</button>
+    </form>
+</div>
