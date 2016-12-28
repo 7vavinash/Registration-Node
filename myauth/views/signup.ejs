@@ -2,7 +2,10 @@
 
 <div class="container">
 	<h2><%= title %></h2>
-
+	<% if(errors){ for (error in errors){ %>
+    	<div class="alert alert-danger"> <%= errors[error].msg %> </div>
+    <% }} %>
+ 
 	<form method="post" action="/users/signup/">
       <div class="form-group">
 	      <label for="username">Username:</label>

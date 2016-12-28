@@ -12,6 +12,16 @@
     "ejs": "~2.5.2",
     "express": "~4.14.0",
     "morgan": "~1.7.0",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "bcryptjs": "*",
+    "connect-flash": "*",
+    "express-messages": "*",
+    "express-session": "^1.14.2",
+    "express-validator": "^2.21.0",
+    "mongoose": "^4.6.8",
+    "mongodb": "*",
+    "passport": "^0.3.2",
+    "passport-http": "^0.3.0",
+    "passport-local": "^1.0.0"
   }
 }
