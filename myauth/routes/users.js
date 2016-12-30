@@ -3,6 +3,14 @@ var router = express.Router();
 var User = require('../models/user');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var jwt = require('jsonwebtoken');
+var JwtStrategy = require('passport-jwt').Strategy,
+    ExtractJwt = require('passport-jwt').ExtractJwt;
+var opts = {}
+opts.jwtFromRequest = ExtractJwt.fromAuthHeader();
+opts.secretOrKey = 'secret';
+
+
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -73,6 +81,8 @@ passport.use(new LocalStrategy(
  		User.comparePassword(password, user.password, function(err,isMatch){
  			if(err) throw err;
  			if(isMatch){
+ 				var token = jwt.sign(user,"secret",{});
+ 				// res.json({success:true,token:'JWT '+token});
  				return done(null, user);
  			} else{
  				return done(null, false, {message: "Incorrect Password"});
@@ -81,11 +91,57 @@ passport.use(new LocalStrategy(
  	});  
 }));
 
+passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
+    User.findOne({id: jwt_payload.sub}, function(err, user) {
+        if (err) {
+            return done(err, false);
+        }
+        if (user) {
+            done(null, user);
+        } else {
+            done(null, false);
+            // or you could create a new account
+        }
+    });
+}));
+
+// For getting jwt token
+router.post('/login_jwt/', function(req, res){
+	User.getUserByUsername(req.body.username, function(err, user){
+ 		if(err) throw err;
+
+ 		if(!user){
+ 			res.send(null, false, {message:'Invalid Username'});
+ 		}else{
+
+	 		User.comparePassword(req.body.password, user.password, function(err,isMatch){
+	 			if(err) throw err;
+	 			if(isMatch){
+	 				var token = jwt.sign(user,"secret",{
+	 					expiresIn:10000000000000000
+	 				});
+	 				res.json({success:true,token:'JWT '+token});
+	 				
+	 			} else{
+ 					res.send(null, false, {message: "Incorrect Password"});
+ 				}
+ 			});
+ 		}
+ 	});
+});
+
 router.post('/login/', passport.authenticate('local', { failureFlash: true,
                                                     failureRedirect: '/users/login', successRedirect: '/', successFlash: "Welcome" }), function(req, res){
 	req.flash("success_msg","you are logged in");
 	res.redirect('/');
 });
+
+// Adding jwt protection
+router.get('/profile/', passport.authenticate('jwt', { session: false }),
+    function(req, res) {
+        res.json(req.user);
+    }
+);
 
 router.get('/logout/', function(req, res){
 	req.logout();
