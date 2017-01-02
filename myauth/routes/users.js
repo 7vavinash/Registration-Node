@@ -84,8 +84,6 @@ passport.use(new LocalStrategy(
  		User.comparePassword(password, user.password, function(err,isMatch){
  			if(err) throw err;
  			if(isMatch){
- 				var token = jwt.sign(user,"secret",{});
- 				// res.json({success:true,token:'JWT '+token});
  				return done(null, user);
  			} else{
  				return done(null, false, {message: "Incorrect Password"});
@@ -110,8 +108,8 @@ passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
 
 
 passport.use(new GoogleStrategy({
-    clientID: "******", //add ur own client id 
-    clientSecret: "*******", // add ur own client secret
+    clientID: "**********", //add ur own client id 
+    clientSecret: "****************", // add ur own client secret
     callbackURL: "/users/auth/google/callback"
   },
   function(accessToken, refreshToken, profile, done) {
@@ -157,7 +155,7 @@ router.post('/login_jwt/', function(req, res){
  	});
 });
 
-router.post('/login/', passport.authenticate('jwt', { failureFlash: true,
+router.post('/login/', passport.authenticate('local', { failureFlash: true,
                                                     failureRedirect: '/users/login', successRedirect: '/', successFlash: "Welcome" }), function(req, res){
 	req.flash("success_msg","you are logged in");
 	res.redirect('/');
