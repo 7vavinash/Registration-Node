@@ -1,5 +1,6 @@
 var mangoose = require('mongoose');
 var bcrypt = require('bcryptjs');
+var findOrCreate = require('mongoose-findorcreate')
 
 
 
@@ -13,9 +14,12 @@ var UserSchema = mangoose.Schema({
 	},
 	email: {
 		type:String
+	}, 
+	googleId: {
+		type:String
 	}
 });
-
+UserSchema.plugin(findOrCreate);
 var User = module.exports = mangoose.model('User', UserSchema);
 
 module.exports.createUser = function (newUser, callback) {

@@ -3,6 +3,9 @@ var router = express.Router();
 var User = require('../models/user');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+
 var jwt = require('jsonwebtoken');
 var JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt;
@@ -105,6 +108,32 @@ passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
     });
 }));
 
+
+passport.use(new GoogleStrategy({
+    clientID: "******", //add ur own client id 
+    clientSecret: "*******", // add ur own client secret
+    callbackURL: "/users/auth/google/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+  		console.log(profile.emails[0].value);
+       User.findOrCreate({ googleId: profile.id}, {username: profile.emails[0].value }, function (err, user) {
+         return done(err, user);
+       });
+  }
+));
+
+router.get('/auth/google',
+  passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login',
+  											'https://www.googleapis.com/auth/plus.profile.emails.read'] }));
+
+
+router.get('/auth/google/callback', 
+  passport.authenticate('google', {session:true, failureRedirect: '/users/login' }),
+  function(req, res) {
+    res.redirect('/');
+  });
+
+
 // For getting jwt token
 router.post('/login_jwt/', function(req, res){
 	User.getUserByUsername(req.body.username, function(err, user){
@@ -117,9 +146,7 @@ router.post('/login_jwt/', function(req, res){
 	 		User.comparePassword(req.body.password, user.password, function(err,isMatch){
 	 			if(err) throw err;
 	 			if(isMatch){
-	 				var token = jwt.sign(user,"secret",{
-	 					expiresIn:10000000000000000
-	 				});
+	 				var token = jwt.sign(user,"secret",{});
 	 				res.json({success:true,token:'JWT '+token});
 	 				
 	 			} else{
@@ -130,14 +157,14 @@ router.post('/login_jwt/', function(req, res){
  	});
 });
 
-router.post('/login/', passport.authenticate('local', { failureFlash: true,
+router.post('/login/', passport.authenticate('jwt', { failureFlash: true,
                                                     failureRedirect: '/users/login', successRedirect: '/', successFlash: "Welcome" }), function(req, res){
 	req.flash("success_msg","you are logged in");
 	res.redirect('/');
 });
 
 // Adding jwt protection
-router.get('/profile/', passport.authenticate('jwt', { session: false }),
+router.get('/profile/', passport.authenticate('jwt', { session: false, failureRedirect: '/users/login' }),
     function(req, res) {
         res.json(req.user);
     }
