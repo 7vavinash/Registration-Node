@@ -108,8 +108,8 @@ passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
 
 
 passport.use(new GoogleStrategy({
-    clientID: "**********", //add ur own client id 
-    clientSecret: "****************", // add ur own client secret
+    clientID: "687880486277-ssvfbl6vlc9aac2ssli528mkpq5tp1rd.apps.googleusercontent.com", //add ur own client id 
+    clientSecret: "-Ta3tuJzBt7vcrckspmgORpa", // add ur own client secret
     callbackURL: "/users/auth/google/callback"
   },
   function(accessToken, refreshToken, profile, done) {

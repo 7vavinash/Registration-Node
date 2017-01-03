@@ -1,6 +1,51 @@
 <% include ./base.ejs %>
+
   <div class="container">
+
+  	<style>
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
   	<% include ./errors.ejs %>
   	<h2> Welcome to <%= title %> page</h2>
+
+
+  	<div class="row">
+	  <div class="span2">
+	      <ul id="people" class="unstyled"></ul>
+	  </div>
+	  <div class="span4">
+	      <ul id="messages" class="unstyled">
+	  </div>
+    <form action="" style="padding: 10px; position: fixed; bottom: 0; width: 100%;">  
+      <input style="border: 0; padding: 10px; width: 80%;background: rgb(130, 224, 255)" id="m" autocomplete="off" />
+      <button style="width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px;">Send</button>
+    </form>
   </div>
+
+<script>
+  var user = "<%= user.username %>";
+  var socket = io();
+  socket.emit('join', user);
+  $('form').submit(function(){
+    socket.emit('chat message', $('#m').val(), user);
+    $('#m').val('');
+    return false;
+  });
+
+  socket.on('chat message', function(user, msg){
+    $('#messages').append($('<li>').text(user+": "+msg));
+  });
+  socket.on('update', function(msg){
+  	$('#messages').append($('<li class="center">').text(msg));
+  });
+  socket.on('update-people', function(people){
+  	$('#people').empty();
+
+  	$.each(people, function(socket_id, name){
+  		$('#people').append($('<li class="center">').text(name));
+  	});
+  });
+</script>
 
