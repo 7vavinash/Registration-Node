@@ -17,6 +17,7 @@ var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/cms');
 var db = mongoose.connection;
 var User = require('./models/user');
+var Chat = require('./models/chat');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -43,6 +44,7 @@ var people = {}
 
 io.on('connection', function (socket) {
 	socket.on("join", function(name){
+
         people[socket.id] = name;
         socket.emit("update", "You have connected to the server.");
         io.sockets.emit("update", name + " has joined the server.")
@@ -54,7 +56,18 @@ io.on('connection', function (socket) {
         delete people[socket.id];
         io.sockets.emit("update-people", people);
   });
-    socket.on('chat message', function(msg){
+    socket.on('chat message', function(user, msg, timestamp){
+    	var chat = new Chat({
+    		chat_id : user.uid,
+    		sender:user,
+    		message:msg,
+    		timestamp: timestamp,
+    		seen: false,
+    	});
+    	chat.save(function(err) {
+                    if (err) console.log(err);
+                    return;
+                });
       	io.sockets.emit('chat message', people[socket.id], msg);
   });
  

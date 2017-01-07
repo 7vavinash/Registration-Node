@@ -25,11 +25,17 @@
   </div>
 
 <script>
-  var user = "<%= user.username %>";
+  var uid = "<%= user.googleId %>";
+  var email = "<%= user.email %>"
+  var user = {
+  	uid:uid,
+  	email: email
+  }
+  var timestamp = new Date()
   var socket = io();
   socket.emit('join', user);
   $('form').submit(function(){
-    socket.emit('chat message', $('#m').val(), user);
+    socket.emit('chat message', user, $('#m').val(), timestamp);
     $('#m').val('');
     return false;
   });

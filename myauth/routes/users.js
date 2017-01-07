@@ -17,8 +17,12 @@ opts.secretOrKey = 'secret';
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+  User.find({}, { email: 1, googleId: 1 },function (err, users){
+		res.json(users);
+	});
+  
 });
+
 
 router.get('/signup/', function(req, res, next){
 	res.render('signup', {title:'Sign Up', errors:{}})
@@ -108,8 +112,8 @@ passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
 
 
 passport.use(new GoogleStrategy({
-    clientID: "687880486277-ssvfbl6vlc9aac2ssli528mkpq5tp1rd.apps.googleusercontent.com", //add ur own client id 
-    clientSecret: "-Ta3tuJzBt7vcrckspmgORpa", // add ur own client secret
+    clientID: "xxxxxxxx", //add ur own client id 
+    clientSecret: "xxxxxxxxx", // add ur own client secret
     callbackURL: "/users/auth/google/callback"
   },
   function(accessToken, refreshToken, profile, done) {
