@@ -1,0 +1,13 @@
+<% include ./base.ejs %>
+
+<div class="container">
+	<h2><%= title %></h2>
+ 
+	<form method="post" action="/add_todo">
+      <div class="form-group">
+	      <label for="task">Todo:</label>
+	      <input class="form-control" type="text" name="task", placeholder="Enter your Task">
+      </div>    
+      <button class="btn btn-default" type="submit" >Submit</button>
+    </form>
+</div>
