@@ -19,7 +19,7 @@ router.get('/', login_required, function(req, res, next) {
 });
 
 router.get('/react', function(req, res, next){
-	res.render('react',{title:"React"});
+	res.render('todos',{title:"React"});
 });
 
 router.get('/todos', function(req, res, next){
@@ -34,9 +34,6 @@ router.get('/todos', function(req, res, next){
 	});
 });
 
-router.get('/add_todo', function(req, res, next){
-	res.render('todos', {title:"Todo"})
-})
 
 router.post('/add_todo',function(req, res, next){
 	Todo.create(req.body, function(err, todo){
@@ -44,7 +41,7 @@ router.post('/add_todo',function(req, res, next){
 			console.log(err);
 			return;
 		}
-		res.redirect('/todos');
+		res.json(todo);
 	});
 });
 
