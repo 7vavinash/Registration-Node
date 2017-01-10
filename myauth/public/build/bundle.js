@@ -56,9 +56,13 @@
 	
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 	
-	var _Todos = __webpack_require__(379);
+	var _Todos = __webpack_require__(178);
 	
 	var _Todos2 = _interopRequireDefault(_Todos);
+	
+	var _Login = __webpack_require__(188);
+	
+	var _Login2 = _interopRequireDefault(_Login);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -80,16 +84,24 @@
 		_createClass(App, [{
 			key: 'render',
 			value: function render() {
-				return _react2.default.createElement(
-					'div',
-					null,
-					_react2.default.createElement(
-						'p',
+				if (localStorage.getItem("token") == null) {
+					return _react2.default.createElement(
+						'div',
 						null,
-						'This is a React Component!'
-					),
-					_react2.default.createElement(_Todos2.default, null)
-				);
+						_react2.default.createElement(_Login2.default, null)
+					);
+				} else {
+					return _react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement(
+							'p',
+							null,
+							'This is a React Component!'
+						),
+						_react2.default.createElement(_Todos2.default, null)
+					);
+				}
 			}
 		}]);
 	
@@ -21526,7 +21538,144 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 178 */,
+/* 178 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _superagent = __webpack_require__(179);
+	
+	var _superagent2 = _interopRequireDefault(_superagent);
+	
+	var _APIManager = __webpack_require__(186);
+	
+	var _APIManager2 = _interopRequireDefault(_APIManager);
+	
+	var _todo = __webpack_require__(187);
+	
+	var _todo2 = _interopRequireDefault(_todo);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var socket = io();
+	
+	var Todos = function (_Component) {
+		_inherits(Todos, _Component);
+	
+		function Todos() {
+			_classCallCheck(this, Todos);
+	
+			var _this = _possibleConstructorReturn(this, (Todos.__proto__ || Object.getPrototypeOf(Todos)).call(this));
+	
+			_this.state = {
+				todo: {
+					task: ""
+				},
+				list: []
+			};
+			return _this;
+		}
+	
+		_createClass(Todos, [{
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				var _this2 = this;
+	
+				socket.on("init", function () {
+					console.log("socket connected");
+				});
+				_APIManager2.default.get('/todos/', null, function (err, res) {
+					if (err) {
+						alert(err);
+						return;
+					}
+					var updatedList = res.body;
+					_this2.setState({
+						list: updatedList
+					});
+				});
+			}
+		}, {
+			key: 'updateTodos',
+			value: function updateTodos(event) {
+				var updatedTodo = Object.assign({}, this.state.todo);
+				updatedTodo['task'] = event.target.value;
+				this.setState({
+					todo: updatedTodo
+				});
+			}
+		}, {
+			key: 'submitTodo',
+			value: function submitTodo() {
+				var _this3 = this;
+	
+				var updatedList = Object.assign([], this.state.list);
+	
+				_APIManager2.default.post('/add_todo', this.state.todo, function (err, res) {
+					if (err) {
+						alert(err);
+						return;
+					}
+	
+					updatedList.push(res.body);
+					_this3.setState({
+						list: updatedList
+					});
+				});
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				console.log(localStorage.getItem('token'));
+				var listItems = this.state.list.map(function (todo, i) {
+					return _react2.default.createElement(
+						'li',
+						{ key: i },
+						' ',
+						_react2.default.createElement(_todo2.default, { task: todo.task }),
+						' '
+					);
+				});
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement('input', { onChange: this.updateTodos.bind(this), className: 'form-control', placeholder: 'Type your task', name: 'task' }),
+					_react2.default.createElement(
+						'button',
+						{ onClick: this.submitTodo.bind(this), className: 'btn btn-submit' },
+						' Submit '
+					),
+					_react2.default.createElement(
+						'ul',
+						{ style: { listStyle: "none", padding: 0 } },
+						listItems
+					)
+				);
+			}
+		}]);
+	
+		return Todos;
+	}(_react.Component);
+	
+	exports.default = Todos;
+
+/***/ },
 /* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -23399,337 +23548,7 @@
 
 
 /***/ },
-/* 186 */,
-/* 187 */,
-/* 188 */,
-/* 189 */,
-/* 190 */,
-/* 191 */,
-/* 192 */,
-/* 193 */,
-/* 194 */,
-/* 195 */,
-/* 196 */,
-/* 197 */,
-/* 198 */,
-/* 199 */,
-/* 200 */,
-/* 201 */,
-/* 202 */,
-/* 203 */,
-/* 204 */,
-/* 205 */,
-/* 206 */,
-/* 207 */,
-/* 208 */,
-/* 209 */,
-/* 210 */,
-/* 211 */,
-/* 212 */,
-/* 213 */,
-/* 214 */,
-/* 215 */,
-/* 216 */,
-/* 217 */,
-/* 218 */,
-/* 219 */,
-/* 220 */,
-/* 221 */,
-/* 222 */,
-/* 223 */,
-/* 224 */,
-/* 225 */,
-/* 226 */,
-/* 227 */,
-/* 228 */,
-/* 229 */,
-/* 230 */,
-/* 231 */,
-/* 232 */,
-/* 233 */,
-/* 234 */,
-/* 235 */,
-/* 236 */,
-/* 237 */,
-/* 238 */,
-/* 239 */,
-/* 240 */,
-/* 241 */,
-/* 242 */,
-/* 243 */,
-/* 244 */,
-/* 245 */,
-/* 246 */,
-/* 247 */,
-/* 248 */,
-/* 249 */,
-/* 250 */,
-/* 251 */,
-/* 252 */,
-/* 253 */,
-/* 254 */,
-/* 255 */,
-/* 256 */,
-/* 257 */,
-/* 258 */,
-/* 259 */,
-/* 260 */,
-/* 261 */,
-/* 262 */,
-/* 263 */,
-/* 264 */,
-/* 265 */,
-/* 266 */,
-/* 267 */,
-/* 268 */,
-/* 269 */,
-/* 270 */,
-/* 271 */,
-/* 272 */,
-/* 273 */,
-/* 274 */,
-/* 275 */,
-/* 276 */,
-/* 277 */,
-/* 278 */,
-/* 279 */,
-/* 280 */,
-/* 281 */,
-/* 282 */,
-/* 283 */,
-/* 284 */,
-/* 285 */,
-/* 286 */,
-/* 287 */,
-/* 288 */,
-/* 289 */,
-/* 290 */,
-/* 291 */,
-/* 292 */,
-/* 293 */,
-/* 294 */,
-/* 295 */,
-/* 296 */,
-/* 297 */,
-/* 298 */,
-/* 299 */,
-/* 300 */,
-/* 301 */,
-/* 302 */,
-/* 303 */,
-/* 304 */,
-/* 305 */,
-/* 306 */,
-/* 307 */,
-/* 308 */,
-/* 309 */,
-/* 310 */,
-/* 311 */,
-/* 312 */,
-/* 313 */,
-/* 314 */,
-/* 315 */,
-/* 316 */,
-/* 317 */,
-/* 318 */,
-/* 319 */,
-/* 320 */,
-/* 321 */,
-/* 322 */,
-/* 323 */,
-/* 324 */,
-/* 325 */,
-/* 326 */,
-/* 327 */,
-/* 328 */,
-/* 329 */,
-/* 330 */,
-/* 331 */,
-/* 332 */,
-/* 333 */,
-/* 334 */,
-/* 335 */,
-/* 336 */,
-/* 337 */,
-/* 338 */,
-/* 339 */,
-/* 340 */,
-/* 341 */,
-/* 342 */,
-/* 343 */,
-/* 344 */,
-/* 345 */,
-/* 346 */,
-/* 347 */,
-/* 348 */,
-/* 349 */,
-/* 350 */,
-/* 351 */,
-/* 352 */,
-/* 353 */,
-/* 354 */,
-/* 355 */,
-/* 356 */,
-/* 357 */,
-/* 358 */,
-/* 359 */,
-/* 360 */,
-/* 361 */,
-/* 362 */,
-/* 363 */,
-/* 364 */,
-/* 365 */,
-/* 366 */,
-/* 367 */,
-/* 368 */,
-/* 369 */,
-/* 370 */,
-/* 371 */,
-/* 372 */,
-/* 373 */,
-/* 374 */,
-/* 375 */,
-/* 376 */,
-/* 377 */,
-/* 378 */,
-/* 379 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _superagent = __webpack_require__(179);
-	
-	var _superagent2 = _interopRequireDefault(_superagent);
-	
-	var _APIManager = __webpack_require__(380);
-	
-	var _APIManager2 = _interopRequireDefault(_APIManager);
-	
-	var _todo = __webpack_require__(381);
-	
-	var _todo2 = _interopRequireDefault(_todo);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var socket = io();
-	
-	var Todos = function (_Component) {
-		_inherits(Todos, _Component);
-	
-		function Todos() {
-			_classCallCheck(this, Todos);
-	
-			var _this = _possibleConstructorReturn(this, (Todos.__proto__ || Object.getPrototypeOf(Todos)).call(this));
-	
-			_this.state = {
-				todo: {
-					task: ""
-				},
-				list: []
-			};
-			return _this;
-		}
-	
-		_createClass(Todos, [{
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-				var _this2 = this;
-	
-				socket.on("init", function () {
-					console.log("socket connected");
-				});
-				_APIManager2.default.get('/todos/', null, function (err, res) {
-					if (err) {
-						alert(err);
-						return;
-					}
-					var updatedList = res.body;
-					_this2.setState({
-						list: updatedList
-					});
-				});
-			}
-		}, {
-			key: 'updateTodos',
-			value: function updateTodos(event) {
-				var updatedTodo = Object.assign({}, this.state.todo);
-				updatedTodo['task'] = event.target.value;
-				this.setState({
-					todo: updatedTodo
-				});
-			}
-		}, {
-			key: 'submitTodo',
-			value: function submitTodo() {
-				var _this3 = this;
-	
-				var updatedList = Object.assign([], this.state.list);
-	
-				_APIManager2.default.post('/add_todo', this.state.todo, function (err, res) {
-					if (err) {
-						alert(err);
-						return;
-					}
-	
-					updatedList.push(res.body);
-					_this3.setState({
-						list: updatedList
-					});
-				});
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var listItems = this.state.list.map(function (todo, i) {
-					return _react2.default.createElement(
-						'li',
-						{ key: i },
-						' ',
-						_react2.default.createElement(_todo2.default, { task: todo.task }),
-						' '
-					);
-				});
-				return _react2.default.createElement(
-					'div',
-					null,
-					_react2.default.createElement('input', { onChange: this.updateTodos.bind(this), className: 'form-control', placeholder: 'Type your task', name: 'task' }),
-					_react2.default.createElement(
-						'button',
-						{ onClick: this.submitTodo.bind(this), className: 'btn btn-submit' },
-						' Submit '
-					),
-					_react2.default.createElement(
-						'ul',
-						null,
-						listItems
-					)
-				);
-			}
-		}]);
-	
-		return Todos;
-	}(_react.Component);
-	
-	exports.default = Todos;
-
-/***/ },
-/* 380 */
+/* 186 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23771,7 +23590,7 @@
 	};
 
 /***/ },
-/* 381 */
+/* 187 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23808,12 +23627,31 @@
 			value: function render() {
 				return _react2.default.createElement(
 					"div",
-					{ style: styles.container },
+					{ style: styles.container, className: "row" },
+					_react2.default.createElement("input", { type: "checkbox", className: "col-sm-1" }),
 					_react2.default.createElement(
 						"p",
-						{ style: styles.task },
+						{ className: "col-sm-9", style: styles.task },
 						this.props.task,
 						" "
+					),
+					_react2.default.createElement(
+						"p",
+						{ className: "col-sm-1" },
+						_react2.default.createElement(
+							"a",
+							{ href: "#" },
+							"Edit"
+						)
+					),
+					_react2.default.createElement(
+						"p",
+						{ className: "col-sm-1" },
+						_react2.default.createElement(
+							"a",
+							{ href: "#" },
+							"Delete"
+						)
 					)
 				);
 			}
@@ -23835,6 +23673,95 @@
 	};
 	
 	exports.default = Todo;
+
+/***/ },
+/* 188 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _APIManager = __webpack_require__(186);
+	
+	var _APIManager2 = _interopRequireDefault(_APIManager);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Login = function (_Component) {
+		_inherits(Login, _Component);
+	
+		function Login() {
+			_classCallCheck(this, Login);
+	
+			return _possibleConstructorReturn(this, (Login.__proto__ || Object.getPrototypeOf(Login)).apply(this, arguments));
+		}
+	
+		_createClass(Login, [{
+			key: 'login',
+			value: function login() {
+				_APIManager2.default.post("/users/login_jwt/", { username: document.getElementById('username').value,
+					password: document.getElementById('password').value }, function (err, res) {
+					if (err) {
+						alert(err);
+						return;
+					}
+					localStorage.setItem("token", res.body.token);
+				});
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(
+						'div',
+						{ className: 'form-group' },
+						_react2.default.createElement(
+							'label',
+							{ htmlFor: 'username' },
+							'Username:'
+						),
+						_react2.default.createElement('input', { id: 'username', className: 'form-control', type: 'text', name: 'username', placeholder: 'Enter your username' })
+					),
+					_react2.default.createElement(
+						'div',
+						{ className: 'form-group' },
+						_react2.default.createElement(
+							'label',
+							{ htmlFor: 'password' },
+							'Password:'
+						),
+						_react2.default.createElement('input', { id: 'password', type: 'password', className: 'form-control', name: 'password', placeholder: 'Enter your password' })
+					),
+					_react2.default.createElement(
+						'button',
+						{ className: 'btn btn-default', type: 'submit', onClick: this.login.bind(this) },
+						'Submit'
+					)
+				);
+			}
+		}]);
+	
+		return Login;
+	}(_react.Component);
+	
+	exports.default = Login;
 
 /***/ }
 /******/ ]);

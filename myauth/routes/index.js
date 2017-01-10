@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
 var Todo = require('../models/todo');
+var LocalStorage = require('node-localstorage').LocalStorage,
+					localStorage = new LocalStorage('./scratch');
 
 
 function login_required(req, res, next){
@@ -19,7 +21,8 @@ router.get('/', login_required, function(req, res, next) {
 });
 
 router.get('/react', function(req, res, next){
-	res.render('todos',{title:"React"});
+	console.log(localStorage.getItem('token'));
+	res.render('todos',{title:"Todos"});
 });
 
 router.get('/todos', function(req, res, next){

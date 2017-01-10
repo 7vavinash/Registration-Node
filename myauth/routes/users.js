@@ -4,6 +4,9 @@ var User = require('../models/user');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 
+var LocalStorage = require('node-localstorage').LocalStorage,
+					localStorage = new LocalStorage('./scratch');
+
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 var jwt = require('jsonwebtoken');
@@ -149,7 +152,11 @@ router.post('/login_jwt/', function(req, res){
 	 			if(err) throw err;
 	 			if(isMatch){
 	 				var token = jwt.sign(user,"secret",{});
+	 				
 	 				res.json({success:true,token:'JWT '+token});
+
+	 				localStorage.setItem("token", token);
+	 				console.log(localStorage.getItem('token'));
 	 				
 	 			} else{
  					res.send(null, false, {message: "Incorrect Password"});
@@ -174,6 +181,7 @@ router.get('/profile/', passport.authenticate('jwt', { session: false, failureRe
 
 router.get('/logout/', function(req, res){
 	req.logout();
+	localStorage.removeItem("token");
 	req.flash("success_msg","you are logged out");
 	res.redirect('/users/login');
 })
