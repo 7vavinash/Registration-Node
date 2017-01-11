@@ -12,6 +12,7 @@ class Login extends Component{
 					return;
 				}
 				localStorage.setItem("token", res.body.token);
+				window.location.href = '/react'
 			})
 	}
 

@@ -19,9 +19,6 @@ class Todos extends Component {
 	}
 
 	componentDidMount(){
-		socket.on("init", () =>{
-			console.log("socket connected")
-		});
 		APIManager.get('/todos/', null, (err, res) => {
 			if (err){
 				alert (err);
@@ -29,7 +26,7 @@ class Todos extends Component {
 			}
 			let updatedList = res.body;
 			this.setState({
-				list: updatedList
+				list: updatedList.reverse()
 			});
 		});
 
@@ -60,17 +57,20 @@ class Todos extends Component {
 	}
 
 	render(){
-		console.log(localStorage.getItem('token'));
 		const listItems = this.state.list.map((todo,i) => {
 			return (
-				<li key={i}> <Todo task={todo.task} /> </li>
+				<li key={i}> <Todo todo={todo} /> </li>
 			);
 		})
 		return (
-			<div>
-				<input onChange={this.updateTodos.bind(this)} className="form-control" placeholder="Type your task" name="task" />
-				<button onClick={this.submitTodo.bind(this)} className="btn btn-submit" > Submit </button>
-				<ul style={{listStyle:"none", padding:0}}>
+			<div className={this.props.className}>
+				<div style={{marginTop:20}} className="container row">
+				<div className="form-group col-md-5">
+					<input onChange={this.updateTodos.bind(this)} className="form-control" placeholder="Type your task" name="task" />
+				</div>
+				<button onClick={this.submitTodo.bind(this)} className="btn btn-submit col-md-2" > Submit </button>
+				</div>
+				<ul className="col-md-9" style={{listStyle:"none", marginLeft:15}}>
 					{listItems}
 				</ul>
 

@@ -1,6 +1,7 @@
 import React, { Component} from 'react'
 import ReactDOM from 'react-dom'
 import Todos from './components/containers/Todos'
+import People from './components/containers/People'
 import Login from './components/containers/Login'
 
 class App extends Component {
@@ -13,9 +14,9 @@ class App extends Component {
 			</div>
 		)} else{
 			return(
-				<div>
-					<p>This is a React Component!</p>
-					<Todos />
+				<div className="row">
+					<Todos className="col-md-10" />
+					<People className="col-md-2" />
 				</div>
 			)}
 	}

@@ -60,7 +60,11 @@
 	
 	var _Todos2 = _interopRequireDefault(_Todos);
 	
-	var _Login = __webpack_require__(188);
+	var _People = __webpack_require__(188);
+	
+	var _People2 = _interopRequireDefault(_People);
+	
+	var _Login = __webpack_require__(189);
 	
 	var _Login2 = _interopRequireDefault(_Login);
 	
@@ -93,13 +97,9 @@
 				} else {
 					return _react2.default.createElement(
 						'div',
-						null,
-						_react2.default.createElement(
-							'p',
-							null,
-							'This is a React Component!'
-						),
-						_react2.default.createElement(_Todos2.default, null)
+						{ className: 'row' },
+						_react2.default.createElement(_Todos2.default, { className: 'col-md-10' }),
+						_react2.default.createElement(_People2.default, { className: 'col-md-2' })
 					);
 				}
 			}
@@ -21597,9 +21597,6 @@
 			value: function componentDidMount() {
 				var _this2 = this;
 	
-				socket.on("init", function () {
-					console.log("socket connected");
-				});
 				_APIManager2.default.get('/todos/', null, function (err, res) {
 					if (err) {
 						alert(err);
@@ -21607,7 +21604,7 @@
 					}
 					var updatedList = res.body;
 					_this2.setState({
-						list: updatedList
+						list: updatedList.reverse()
 					});
 				});
 			}
@@ -21642,28 +21639,35 @@
 		}, {
 			key: 'render',
 			value: function render() {
-				console.log(localStorage.getItem('token'));
 				var listItems = this.state.list.map(function (todo, i) {
 					return _react2.default.createElement(
 						'li',
 						{ key: i },
 						' ',
-						_react2.default.createElement(_todo2.default, { task: todo.task }),
+						_react2.default.createElement(_todo2.default, { todo: todo }),
 						' '
 					);
 				});
 				return _react2.default.createElement(
 					'div',
-					null,
-					_react2.default.createElement('input', { onChange: this.updateTodos.bind(this), className: 'form-control', placeholder: 'Type your task', name: 'task' }),
+					{ className: this.props.className },
 					_react2.default.createElement(
-						'button',
-						{ onClick: this.submitTodo.bind(this), className: 'btn btn-submit' },
-						' Submit '
+						'div',
+						{ style: { marginTop: 20 }, className: 'container row' },
+						_react2.default.createElement(
+							'div',
+							{ className: 'form-group col-md-5' },
+							_react2.default.createElement('input', { onChange: this.updateTodos.bind(this), className: 'form-control', placeholder: 'Type your task', name: 'task' })
+						),
+						_react2.default.createElement(
+							'button',
+							{ onClick: this.submitTodo.bind(this), className: 'btn btn-submit col-md-2' },
+							' Submit '
+						)
 					),
 					_react2.default.createElement(
 						'ul',
-						{ style: { listStyle: "none", padding: 0 } },
+						{ className: 'col-md-9', style: { listStyle: "none", marginLeft: 15 } },
 						listItems
 					)
 				);
@@ -23625,15 +23629,26 @@
 		_createClass(Todo, [{
 			key: "render",
 			value: function render() {
+				var timestamp = this.props.todo.timestamp.split("T")[0];
+	
 				return _react2.default.createElement(
 					"div",
 					{ style: styles.container, className: "row" },
 					_react2.default.createElement("input", { type: "checkbox", className: "col-sm-1" }),
 					_react2.default.createElement(
-						"p",
-						{ className: "col-sm-9", style: styles.task },
-						this.props.task,
-						" "
+						"div",
+						{ className: "col-sm-9" },
+						_react2.default.createElement(
+							"p",
+							{ style: styles.task },
+							this.props.todo.task,
+							" "
+						),
+						_react2.default.createElement(
+							"span",
+							null,
+							timestamp
+						)
 					),
 					_react2.default.createElement(
 						"p",
@@ -23665,6 +23680,7 @@
 			padding: 12,
 			background: "#f9f9f9",
 			border: "1px solid #ddd",
+			borderRadius: 12,
 			marginTop: 10
 		},
 		task: {
@@ -23676,6 +23692,94 @@
 
 /***/ },
 /* 188 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var socket = io();
+	
+	var People = function (_Component) {
+		_inherits(People, _Component);
+	
+		function People() {
+			_classCallCheck(this, People);
+	
+			var _this = _possibleConstructorReturn(this, (People.__proto__ || Object.getPrototypeOf(People)).call(this));
+	
+			_this.state = {
+				list: []
+			};
+			return _this;
+		}
+	
+		_createClass(People, [{
+			key: "componentDidMount",
+			value: function componentDidMount() {
+				var _this2 = this;
+	
+				socket.emit("join", localStorage.getItem("token"));
+				socket.on("update-people", function (people) {
+					_this2.setState({
+						list: people
+					});
+				});
+			}
+		}, {
+			key: "personalChat",
+			value: function personalChat(i) {
+				console.log(this.state.list[i]._id);
+			}
+		}, {
+			key: "render",
+			value: function render() {
+				var _this3 = this;
+	
+				var listItems = this.state.list.map(function (people, i) {
+					return _react2.default.createElement(
+						"li",
+						{ key: i, onClick: _this3.personalChat.bind(_this3, i) },
+						" ",
+						people.username,
+						" "
+					);
+				});
+				return _react2.default.createElement(
+					"div",
+					{ className: this.props.className },
+					_react2.default.createElement(
+						"ul",
+						{ style: { listStyle: "none", padding: 0 } },
+						listItems
+					)
+				);
+			}
+		}]);
+	
+		return People;
+	}(_react.Component);
+	
+	exports.default = People;
+
+/***/ },
+/* 189 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23721,6 +23825,7 @@
 						return;
 					}
 					localStorage.setItem("token", res.body.token);
+					window.location.href = '/react';
 				});
 			}
 		}, {

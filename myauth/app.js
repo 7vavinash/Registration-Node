@@ -40,20 +40,28 @@ var server = http.createServer(app);
 
 var io = require('socket.io')(server);
 
-var people = {}
+var people;
 
 io.on('connection', function (socket) {
 	socket.on("join", function(name){
+        User.find({},{username:1},function(err, users){
+          if(err){
+            console.log(err);
+            return;
+          }
+          people = users
+          io.sockets.emit("update-people", people);
+        });
+        
 
-        people[socket.id] = name;
         socket.emit("update", "You have connected to the server.");
         io.sockets.emit("update", name + " has joined the server.")
-        io.sockets.emit("update-people", people);
+        
     });
 	console.log("user connected");
     socket.on('disconnect', function(){
-    	io.sockets.emit("update", people[socket.id] + " has left the server.");
-        delete people[socket.id];
+    	// io.sockets.emit("update", people[socket.id] + " has left the server.");
+      // delete people[socket.id];
         io.sockets.emit("update-people", people);
   });
     socket.on('chat message', function(user, msg, timestamp){
